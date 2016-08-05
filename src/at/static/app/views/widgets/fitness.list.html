@@ -1,0 +1,23 @@
+<div id="fitness-list-widget{_ id _}" class="box box-default">
+    <div class="box-header with-border">
+        <h3 class="box-title">
+            My Fitness Records
+        </h3>
+        <div class="box-tools pull-right">
+            <button class="btn btn-box-tool" data-widget="remove" ng-click="removeWidget(id)"><i class="fa fa-times"></i></button>
+        </div>
+    </div>
+    <div class="box-body">
+        <div ng-repeat="record in records">
+            <div class="list-group">
+                <a class="list-group-item">
+                    <h4 class="list-group-item-heading">
+                        {_ record.name _}
+                        <i class="fa fa-times pull-right" ng-click="deleteRecord(record.id)" style="cursor: pointer;"></i>
+                    </h4>
+                    <p class="list-group-item-text">{_ record.path _}</p>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>

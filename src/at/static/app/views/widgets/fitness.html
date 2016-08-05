@@ -1,0 +1,37 @@
+<div id="fitness-widget{_ id _}" class="box box-default">
+    <div class="box-header with-border">
+        <h3 class="box-title">
+            My Fitness Data
+        </h3>
+        <div class="box-tools pull-right">
+            <button id="{_ id _}-prev-btn" class="btn btn-box-tool" ng-click="toogle(-1)" disabled><i class="fa fa-arrow-left"></i></button>
+            <button id="{_ id _}-next-btn" class="btn btn-box-tool" ng-click="toogle(1)"><i class="fa fa-arrow-right"></i></button>
+            <button class="btn btn-box-tool" data-widget="remove" ng-click="removeWidget(id)"><i class="fa fa-times"></i></button>
+        </div>
+    </div>
+    <div class="box-body">
+        <h4 style="display: inline;">
+            {_ recordName _}
+            <button class="btn btn-box-tool" ng-click="share()"><i class="fa fa-share-alt fa-lg"></i></button>
+        </h4>
+        <div class="records-info row">
+            <div class="col-md-3">
+                <h1 class="record-detail">{_ activities[currentRecord].distance _} <small>km</small></h1>
+                <div>Distance</div>
+            </div>
+            <div class="col-md-3">
+                <h1 class="record-detail">{_ activities[currentRecord].time _} <small>min</small></h1>
+                <div>Time</div>
+            </div>
+            <div class="col-md-3">
+                <h1 class="record-detail">{_ activities[currentRecord].avgSpeed _} <small>km/h</small></h1>
+                <div>Average Speed</div>
+            </div>
+            <div class="col-md-3">
+                <h1 class="record-detail">{_ activities[currentRecord].calories _} <small>C</small></h1>
+                <div>Calories</div>
+            </div>
+        </div>
+        <div class="record-details"></div>
+    </div>
+</div>

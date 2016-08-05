@@ -1,0 +1,314 @@
+{% extends "base.html" %}
+
+{% block html_attribs %}
+    {{ super() }}
+    ng-app="entrance"
+{% endblock html_attribs %}
+
+{% block title %}
+    entrance - Admin Tool
+{% endblock title %}
+
+{% block body_attribs %}
+    {{ super() }}
+{% endblock body_attribs %}
+
+{% block navbar_entries %}
+    <li class="dropdown user user-menu">
+        <a href="" class="dropdown-toggle" data-toggle="dropdown">
+            <span class="hidden-xs">{{ current_user.username }}</span>
+            <ul class="dropdown-menu">
+                <!-- User image -->
+                <li class="user-header"></li>
+                <li class="user-body"></li>
+                <li class="user-footer">
+                    <div class="pull-left">
+                        <a href="" class="btn btn-default btn-flat">Profile</a>
+                    </div>
+                    <div class="pull-right">
+                        <a href="/user/sign-out" class="btn btn-default btn-flat">Sign out</a>
+                    </div>
+                </li>
+            </ul>
+        </a>
+    </li>
+{% endblock navbar_entries %}
+
+{% block sidebar_content %}
+    <ul class="sidebar-menu" ng-controller="NavigationController">
+        <li style="padding: 16px;">
+            {% if request.url_rule.rule == '/admintool/tresor/' %}
+                <img class="img-responsive" src="{{ url_for('at.static', filename='assets/logo_tresor.png') }}">
+            {% else %}
+                <img class="img-responsive" src="{{ url_for('at.static', filename='assets/logo_entrance.png') }}">
+            {% endif %}
+        </li>
+        <li class="header">MAIN NAVIGATION</li>
+        <li><a href="#contacts"><i class="fa fa-users"></i><span>Contacts</span></a></li>
+        <li><a href="#container"><i class="fa fa-archive"></i><span>Container</span></a></li>
+        <li class="treeview">
+            <a href="">
+                <i class="fa fa-dashboard"></i>
+                <span>My dashboards</span>
+                <i class="fa fa-angle-left pull-right"></i>
+            </a>
+            <ul class="treeview-menu" style="display: none;">
+                <li ng-repeat="page in pages">
+                    <a href="#page/{_ page.slug _}/">
+                        <i class="fa fa-circle-o"></i>{_ page.name _}
+                        <i class="fa fa-trash-o" ng-click="removePageBtnClick(page.slug)" style="float: right;"></i>
+                    </a>
+                </li>
+                <li>
+                    <a href="#"><i class="fa fa-plus"></i>Add dashboard</a>
+                    <input type="text" name="newPageName" value="" ng-model="newPageName" ng-enter="addPageBtnClick(newPageName)" />
+                    <button ng-click="addPageBtnClick(newPageName)"><i class="fa fa-plus"></i></button>
+                </li>
+            </ul>
+        </li>
+        <li class="treeview">
+            <a href="">
+                <i class="fa fa-puzzle-piece"></i>
+                <span>My widgets</span>
+                <i class="fa fa-angle-left pull-right"></i>
+            </a>
+            <ul class="treeview-menu" style="display: none;">
+                <li ng-repeat="widget in widgets">
+                    <a href="" ng-click="addWidgetClick(widget)"><i class="fa fa-circle-o"></i>{_ widget.name _}</a>
+                </li>
+            </ul>
+        </li>
+        <li><a href="" ng-click="open()"><i class="fa fa-hdd-o"></i><span>File Explorer</span></a></li>
+        <li><a href="#kex"><i class="fa fa-key"></i><span>Key exchange</span></a></li>
+    </ul>
+{% endblock sidebar_content %}
+
+{% block content_title %}
+{% endblock content_title %}
+
+{% block breadcrumb %}
+{% endblock breadcrumb %}
+
+{% block main_content %}
+
+    <div id="previews" class="table table-striped" style="display: none;">
+
+        <div id="-dropzone-template" class="file-row">
+            <div>
+                <span class="preview" style="color: black;">
+                    <i class="fa fa-file-text"></i>
+                    <span class="name" data-dz-name></span>
+                    <span class="size" data-dz-size style="float: right;"></span>
+                    <i class="fa fa-check-circle dropzone-success" style="display: none; color: limegreen;"></i>
+                    <i class="fa fa-exclamation-circle dropzone-error" style="display: none; color: tomato;"></i>
+                </span>
+            </div>
+            <div>
+                <strong class="error text-danger" data-dz-errormessage></strong>
+            </div>
+            <div>
+                <div class="progress progress-striped active dropzone-progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+                    <div class="progress-bar progress-bar-success" style="width:0%;" data-dz-uploadprogress></div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div ng-view></div>
+
+    <div id="share-modal" class="modal fade" role="dialog" aria-labelledby="gridSystemModalLabel" aria-hidden="true" ng-controller="ShareController">
+        <div class="modal-dialog">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">Share data</h4>
+                </div>
+
+                <div class="modal-body">
+                    <div class="container-fluid">
+                        <div class="row">
+                            <div class="col-md-12">
+
+                                <form>
+
+                                    <div class="form-group">
+                                        <label for="share-policy">Name:</label>
+                                        <input type="text" class="form-control" id="share-name" placeholder="Name">
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="share-policy">Policy:</label>
+                                        <input type="text" class="form-control" id="share-policy" placeholder="Policy" policy-authoring>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <div class="checkbox">
+                                            <label>
+                                                <input id="share-advanced" type="checkbox" ng-click="toggle()"> Advanced
+                                            </label>
+                                        </div>
+                                    </div>
+
+                                    <div id="share-advanced-fields" style="display: none;">
+
+                                        <div ng-repeat="file in files">
+                                            <div class="form-group">
+                                                <label>Policy for {_ file.filename _}:</label>
+                                                <input type="text" class="form-control" placeholder="Policy" policy-authoring>
+                                            </div>
+                                        </div>
+
+                                    </div>
+
+
+                                </form>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">
+                        <i class="fa fa-times" aria-hidden="true"></i> Cancel
+                    </button>
+                    <button id="btn-share" type="button" class="btn btn-primary">
+                        <i id="share-btn-icon" class="fa fa-check"></i> Encrypt
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="download-modal" class="modal fade" role="dialog" aria-labelledby="gridSystemModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">Download container</h4>
+                </div>
+
+                <div class="modal-body">
+                    <div class="container-fluid">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <i class="fa fa-download fa-lg"></i><a href="/container/{_ container_id _}/download"> Download container</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">
+                        <i class="fa fa-times" aria-hidden="true"></i> Cancel
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="fexplorer-modal" class="modal fade" role="dialog" aria-labelledby="gridSystemModalLabel" aria-hidden="true" ng-controller="FexplorerController">
+        <div class="modal-dialog">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">File Explorer</h4>
+                </div>
+
+                <div class="modal-body">
+                    <div class="container-fluid">
+                        <div class="row">
+                            <div class="col-md-12">
+
+                                <uib-tabset active="active">
+                                    <uib-tab heading="File explorer" ng-click="refresh()">
+                                        <ui-pane active="pane.active">
+                                            <!--
+                                            <div>
+                                                <input id="toggle-dirs" type="checkbox" ng-click="toggle()" />
+                                                <label for="toggle-dirs">Show/Hide files</label>
+                                            </div>
+                                            -->
+                                            <div id="folders-files-container">
+                                                <div id="folders-files" class="filetree-basic">
+                                                    <ul class="jqueryFileTree" style="display: block;"></ul>
+                                                </div>
+                                            </div>
+
+                                            <div id="only-folders-container">
+                                                <div id="only-folders" class="filetree-basic" style="display: none;">
+                                                    <ul class="jqueryFileTree" style="display: block;"></ul>
+                                                </div>
+                                            </div>
+                                        </ui-pane>
+                                    </uib-tab>
+                                    <uib-tab heading="Upload files">
+
+                                        <form id="adropzone" class="adropzone" dropzone="">
+                                            <div id="adropzone-default" class="dz-default dz-message">
+                                                <i class="fa fa-cloud-upload fa-5x"></i>
+                                                <p class="text-center">
+                                                    Drag a file from your desktop into this area and drop it to upload it.
+                                                </p>
+                                            </div>
+                                        </form>
+
+                                    </uib-tab>
+                                </uib-tabset>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">
+                        <i class="fa fa-times" aria-hidden="true"></i> Cancel
+                    </button>
+                    <button id="fexplorer-btn-choose" type="button" class="btn btn-primary" data-dismiss="modal">
+                        <i class="fa fa-folder-open" aria-hidden="true"></i> Choose
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock main_content %}
+
+{% block scripts %}
+    {{ super() }}
+    <script src="{{ url_for('at.static', filename='app/app.js') }}" type="text/javascript"></script>
+    <script src="{{ url_for('at.static', filename='app/routes.js') }}" type="text/javascript"></script>
+
+    <script src="{{ url_for('at.static', filename='app/services/contact.property.js') }}" type="text/javascript"></script>
+    <script src="{{ url_for('at.static', filename='app/services/contact.js') }}" type="text/javascript"></script>
+    <script src="{{ url_for('at.static', filename='app/services/contact.attribute.js') }}" type="text/javascript"></script>
+    <script src="{{ url_for('at.static', filename='app/services/container.js') }}" type="text/javascript"></script>
+    <script src="{{ url_for('at.static', filename='app/services/ctrl.comm.js') }}" type="text/javascript"></script>
+    <script src="{{ url_for('at.static', filename='app/services/fexplorer.js') }}" type="text/javascript"></script>
+    <script src="{{ url_for('at.static', filename='app/services/page.js') }}" type="text/javascript"></script>
+    <script src="{{ url_for('at.static', filename='app/services/user.js') }}" type="text/javascript"></script>
+    <script src="{{ url_for('at.static', filename='app/services/widget.js') }}" type="text/javascript"></script>
+    <script src="{{ url_for('at.static', filename='app/services/widgets/fitness.js') }}" type="text/javascript"></script>
+
+    <script src="{{ url_for('at.static', filename='app/controllers/contact.ctrl.js') }}" type="text/javascript"></script>
+    <script src="{{ url_for('at.static', filename='app/controllers/container.ctrl.js') }}" type="text/javascript"></script>
+    <script src="{{ url_for('at.static', filename='app/controllers/kex.ctrl.js') }}" type="text/javascript"></script>
+    <script src="{{ url_for('at.static', filename='app/controllers/fexplorer.ctrl.js') }}" type="text/javascript"></script>
+    <script src="{{ url_for('at.static', filename='app/controllers/navigation.ctrl.js') }}" type="text/javascript"></script>
+    <script src="{{ url_for('at.static', filename='app/controllers/page.ctrl.js') }}" type="text/javascript"></script>
+    <script src="{{ url_for('at.static', filename='app/controllers/share.ctrl.js') }}" type="text/javascript"></script>
+    <script src="{{ url_for('at.static', filename='app/controllers/widget.ctrl.js') }}" type="text/javascript"></script>
+    <script src="{{ url_for('at.static', filename='app/controllers/widgets/fitness.add.ctrl.js') }}" type="text/javascript"></script>
+    <script src="{{ url_for('at.static', filename='app/controllers/widgets/fitness.ctrl.js') }}" type="text/javascript"></script>
+    <script src="{{ url_for('at.static', filename='app/controllers/widgets/fitness.list.ctrl.js') }}" type="text/javascript"></script>
+    <script src="{{ url_for('at.static', filename='app/controllers/widgets/gallery.ctrl.js') }}" type="text/javascript"></script>
+
+    <script src="{{ url_for('at.static', filename='app/directives/main.directives.js') }}" type="text/javascript"></script>
+{% endblock scripts %}
+
+{% block footer %}
+{% endblock footer %}

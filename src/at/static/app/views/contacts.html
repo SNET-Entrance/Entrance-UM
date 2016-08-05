@@ -1,0 +1,64 @@
+<div class="container-fluid contacts-container">
+
+    <div class="row">
+        <div class="col-md-3">
+            <div class="box box-default">
+                <div class="box-body">
+                    Name: <input id="add-new-contact-name" type="text" ng-model="newContactName" placeholder="John Doe" ng-enter="addNewContact(newContactName, newContactEmail)"><br />
+                    E-Mail: <input id="add-new-contact" type="text" ng-model="newContactEmail" placeholder="john.doe@example.com" ng-enter="addNewContact(newContactName, newContactEmail)">
+                    <button ng-click="addNewContact(newContactName, newContactEmail)"><i id="add-contact-btn" class="fa fa-plus"></i></button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-4" ng-repeat="contact in contacts">
+
+            <div class="box box-default">
+                <div class="box-header with-border">
+                    <h3 class="contact-name box-title" ng-click="edit($event, this)">{_ contact.name _}</h3><h5><{_ contact.email _}></h5>
+                    <div class="box-tools pull-right">
+                        <a class="btn btn-box-tool" href="/contacts/{_ contact.id _}/private_key"><i class="fa fa-key fa-lg"></i></a>
+                        <button class="btn btn-box-tool" data-widget="remove" ng-click="deleteContact(contact.id)"><i class="fa fa-times"></i></button>
+                    </div>
+                </div><!-- /.box-header -->
+                <div class="box-body">
+                    <!--
+                    <b>Properties:</b>
+                    <dl class="dl-horizontal">
+                        <div ng-repeat="property in contact.properties">
+                            <dt class="property-key" ng-click="edit($event, this)">{_ property.key _}</dt>
+                            <dd class="property-value" ng-click="edit($event, this)">{_ property.value _} <i class="fa fa-times" ng-click="deleteProperty(contact.id, property.id)" style="float: right; cursor: pointer;"></i></dd>
+                        </div>
+                        <dt><input id="{_ contact.id _}-contact-property-key" type="text" ng-model="newPropertyKey" style="text-align: right;" placeholder="key" property-suggestions></dt>
+                        <dd>
+                            <input id="{_ contact.id _}-contact-property-value" type="text" ng-model="newPropertyValue" ng-enter="addNewProperty(contact.id, newPropertyKey, newPropertyValue)" placeholder="value">
+                            <button ng-click="addNewProperty(contact.id, newPropertyKey, newPropertyValue)"><i class="fa fa-plus"></i></button>
+                        </dd>
+                    </dl>
+                    -->
+
+                    <b>Attributes:</b>
+                    <input type="text" class="form-control" value="" attr-suggestions placeholder="Add new attribute" />
+                    <!--
+                    <dl class="dl-horizontal">
+                        <div ng-repeat="attribute in contact.attributes">
+                            <dt></dt>
+                            <dd class="attribute-name">{_ attribute.display_name _} <i class="fa fa-times" ng-click="deleteAttribute(contact.id, attribute.id)" style="float: right; cursor: pointer;"></i></dd>
+                        </div>
+                        <dt></dt>
+                        <dd>
+                            <input id="{_ contact.id_}-contact-attribute-name" class="contact-attribute-name" type="text" ng-model="newAttributeName" ng-enter="addNewAttribute(contact.id, newAttributeName)" placeholder="attribute" attr-suggestions>
+                            <button ng-click="addNewAttribute(contact.id, newAttributeName)"><i class="fa fa-plus"></i></button>
+                        </dd>
+                    </dl>
+                    -->
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+

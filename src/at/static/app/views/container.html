@@ -1,0 +1,34 @@
+<div class="container-fluid contacts-container">
+
+    <div class="row">
+
+        <div class="col-md-6" ng-repeat="container in containers">
+
+            <div class="box box-default">
+                <div class="box-header with-border">
+                    <h3 class="contact-name box-title" ng-click="">{_ container.name _}</h3>
+                    <div class="box-tools pull-right">
+                        <a class="btn btn-box-tool" href="/container/{_ container.id _}/download"><i class="fa fa-download fa-lg"></i></a>
+                        <button class="btn btn-box-tool" data-widget="remove" ng-click="deleteContainer(container.id)"><i class="fa fa-times"></i></button>
+                    </div>
+                </div>
+                <div class="box-body">
+                    <b>Information:</b>
+                    <dl class="dl-horizontal">
+                        <dt>Path</dt><dd>{_ container.path _}</dd>
+                    </dl>
+                    <b>Files:</b>
+                    <dl class="dl-horizontal">
+                        <div class="container-file" ng-repeat="file in container.files">
+                            <dt>File path</dt><dd>{_ file.path _}</dd>
+                            <dt>Policy</dt><dd>{_ file.policy _}</dd>
+                        </div>
+                    </dl>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>

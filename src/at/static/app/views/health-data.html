@@ -1,0 +1,26 @@
+<div class="container-fluid contacts-container">
+
+    <div class="row" ng-repeat="record in records">
+
+        <div class="col-md-6">
+
+            <div class="box box-default">
+                <div class="box-header with-border">
+                    <h3 class="contact-name box-title" ng-click="">{_ record.name _}</h3>
+                    <div class="box-tools pull-right">
+                        <button class="btn btn-box-tool" data-widget="remove" ng-click="deleteRecords(record.id)"><i class="fa fa-times"></i></button>
+                    </div>
+                </div>
+                <div class="box-body">
+                    <b>Information:</b>
+                    <dl class="dl-horizontal">
+                        <dt>Path</dt><dd>{_ record.path _}</dd>
+                    </dl>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>

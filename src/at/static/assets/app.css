@@ -1,0 +1,63 @@
+.sortable-item { padding-left: 1em; padding-right: 1em; margin-bottom: 1em; }
+.sortable-item .box.box-default { margin-bottom: 0px; }
+
+.placeholder {
+    margin-left: 1em;
+    margin-right: 1em;
+    margin-bottom: 1em;
+    border: 1px solid #ccc;
+    -webkit-box-shadow: 0px 0px 10px #888;
+    -moz-box-shadow: 0px 0px 10px #888;
+    box-shadow: 0px 0px 10px #888;
+}
+
+.contacts-container input {
+    border: none;
+    border-bottom: 1px solid darkgrey;
+}
+
+.contact-name, .property-key, .property-value, .attribute-name {
+    cursor: text;
+}
+
+.ui-autocomplete {
+    z-index: 9999 !important;
+}
+
+.container-file {
+    margin: 6px;
+}
+
+.dropzone, .adropzone {
+    padding: 24px;
+    border: 3px dashed #acb0b8;
+    color: #ACB0B8;
+}
+
+.dropzone-over {
+    padding: 24px;
+    border: 3px dashed #48484c;
+    color: #48484c;
+}
+
+.dz-default, .dz-message {
+    text-align: center;
+}
+
+h1.record-detail {
+    margin-bottom: 0px;
+}
+
+ul.jqueryFileTree li {
+    cursor: default;
+}
+
+.tokenfield {
+    border: none !important;
+    padding: 0px !important;
+    margin-top: 10px;
+}
+
+.tab-pane {
+    padding-top: 10px !important;
+}
