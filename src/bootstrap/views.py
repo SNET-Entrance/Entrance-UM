@@ -3,8 +3,8 @@ import json
 
 import requests
 from flask import redirect, url_for, request, make_response
-from flask.ext.login import current_user
-from flask.ext.user import login_required
+from flask_login import current_user
+from flask_user import login_required
 
 from bootstrap import app, umcm_client_id, umcm_client_secret, kex_url, db
 

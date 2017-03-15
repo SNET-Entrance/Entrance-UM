@@ -2,9 +2,9 @@ import json
 from datetime import datetime, timedelta
 
 from flask import request, render_template, make_response, current_app
-from flask.ext.login import current_user
-from flask.ext.oauthlib.provider import OAuth2Provider
-from flask.ext.user import login_required, passwords
+from flask_login import current_user
+from flask_oauthlib.provider import OAuth2Provider
+from flask_user import login_required, passwords
 from werkzeug.security import gen_salt
 
 from bootstrap import app, db, login_manager

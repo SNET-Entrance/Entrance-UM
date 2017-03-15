@@ -1,11 +1,11 @@
 import os
 from const import basedir
 from flask import Flask
-from flask.ext.mail import Mail
-from flask.ext.sqlalchemy import SQLAlchemy
-from flask.ext.user import SQLAlchemyAdapter, UserManager
-from flask.ext.user.signals import user_registered
-from flask.ext.login import LoginManager
+from flask_mail import Mail
+from flask_sqlalchemy import SQLAlchemy
+from flask_user import SQLAlchemyAdapter, UserManager
+from flask_user.signals import user_registered
+from flask_login import LoginManager
 from flask_bootstrap import Bootstrap
 import jinja2
 
