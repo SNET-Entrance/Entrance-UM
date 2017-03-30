@@ -11,7 +11,7 @@ Initialize the Dashboard:
 	.../src$ sudo python setup-database.py install 
 	.../src$ sudo python setup.py install
 	
-Run the Service:
+Start the service:
 	
 	.../src$ python run.py
 	
