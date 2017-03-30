@@ -7,8 +7,10 @@ In order to use teh Dashboard, please add a valid email provider information to 
 
 Initialize the Dashboard:
 
-...$ cd src/
+...$ cd src/ 
+
 .../src$ sudo python setup-database.py install 
+
 .../src$ sudo python setup.py install
 
 Run the Service:
