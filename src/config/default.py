@@ -29,7 +29,7 @@ USER_AFTER_LOGIN_ENDPOINT = 'at.index'
 CSRF_ENABLED = False
 
 MAIL_USERNAME = 'entrance.project.tu@gmail.com'
-MAIL_PASSWORD = 'password'
+MAIL_PASSWORD = 'password1'
 MAIL_DEFAULT_SENDER = 'entrance.project.tu@gmail.com'
 MAIL_SERVER = 'smtp.gmail.com'
 MAIL_PORT = 465
