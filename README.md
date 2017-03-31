@@ -5,6 +5,12 @@ This python program it a frontend for Entrance users. It enables the user to mai
 
 In order to use teh Dashboard, please add a valid email provider information to https://github.com/SNET-Entrance/Entrance-UM/blob/master/src/config/default.py . This email provider will be used to send invitation emails to users trying to register to the Dashboard.
 
+
+Preliminaries:
+
+- rename src/config/default.py.example to src/config/default.py 
+- edit src/config/default.py for your needs (provide valid email provider settings).
+
 Initialize the Dashboard:
  	
 	...$ cd src/
@@ -16,3 +22,5 @@ Start the service:
 	.../src$ python run.py
 	
 Check whether a hidden ".entrance" directory in your home folder exists.
+
+
