@@ -1,7 +1,7 @@
 import base64
 from flask import request, make_response
-from flask.ext.login import current_user
-from flask.ext.user import login_required
+from flask_login import current_user
+from flask_user import login_required
 
 from fexplorer import fexplorer
 import os
