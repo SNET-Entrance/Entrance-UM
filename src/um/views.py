@@ -1,5 +1,6 @@
 import base64
 import json
+import sys
 
 from flask import request, make_response
 from flask_user import login_required, current_user
@@ -26,7 +27,7 @@ def show_users():
 
 @um.route('', methods=['POST'])
 @login_required
-def add_user():
+def add_user(): # this adds a new contact for a logged-in user
     data = json.JSONDecoder().decode(request.data)
     if 'name' not in data or 'email' not in data:
         return make_response('', 400) # error missing parameters
@@ -47,10 +48,13 @@ def add_user():
     db.session.add(user)
     db.session.commit()
 
+
     aa_response = AttrAuth.add_user(user) # inform AA about created user
     if aa_response is None:
         db.session.delete(user) # delete user in error case
         db.session.commit()
+
+
         return make_response('', 500)
 
     user.secret_key = aa_response['secretSeed'] # the AA currently responds with the secret seed not the secret key

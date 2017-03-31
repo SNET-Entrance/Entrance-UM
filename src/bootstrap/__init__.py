@@ -80,3 +80,5 @@ def _after_registration_hook(sender, user, **extra):
     attr_all = models.Attribute(all_attr, True, user.id)
     db.session.add(attr_all)
     db.session.commit()
+    db.session.flush()
+

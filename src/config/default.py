@@ -28,9 +28,9 @@ USER_APP_NAME = 'entrance'
 USER_AFTER_LOGIN_ENDPOINT = 'at.index'
 CSRF_ENABLED = False
 
-MAIL_USERNAME = 'some-username'
-MAIL_PASSWORD = 'passwd'
-MAIL_DEFAULT_SENDER = 'sender@dashbaord.zz'
+MAIL_USERNAME = 'entrance.project.tu@gmail.com'
+MAIL_PASSWORD = 'Kk4--1mxX%'
+MAIL_DEFAULT_SENDER = 'entrance.project.tu@gmail.com'
 MAIL_SERVER = 'smtp.gmail.com'
 MAIL_PORT = 465
 MAIL_USE_SSL = True
