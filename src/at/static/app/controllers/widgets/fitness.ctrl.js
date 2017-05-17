@@ -20,6 +20,7 @@ app.controller("FitnessController", function($scope, $controller, FitnessService
             if ($scope.activities.length > 0) {
                 $scope.visualizeActivity(0);
                 $scope.recordName = $scope.activities[0].name;
+                $scope.recordDate = $scope.activities[0].date;
                 $scope.currentRecord = 0;
             }
         }
@@ -50,6 +51,7 @@ app.controller("FitnessController", function($scope, $controller, FitnessService
 
         $scope.currentRecord = $scope.currentRecord + toogle;
         $scope.recordName = $scope.activities[$scope.currentRecord].name;
+        $scope.recordDate = $scope.activities[$scope.currentRecord].date;
         $scope.visualizeActivity($scope.currentRecord);
     };
 

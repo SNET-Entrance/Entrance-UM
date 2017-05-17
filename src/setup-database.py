@@ -42,6 +42,17 @@ user = User(
     pages='[{"widgets": [], "name": "My Dashboard", "slug": "my-dashboard"}]'
 )
 db.session.add(user)
+
+user2 = User(
+    username='test',
+    password='$2a$12$Ou1onuD8TtnkyyKsDr7JPe53sabvcKElgd5La9DWUOBKrYDbk.jCy',
+    email='test@notavailable.org',
+    confirmed_at=datetime.datetime.now(),
+    active=True,
+    pages='[{"widgets": [], "name": "My Dashboard", "slug": "my-dashboard"}]'
+)
+db.session.add(user2)
+
 db.session.commit()
 
 from um import models
