@@ -54,8 +54,7 @@ def get_fitfile(file_id):
 
 @fit.route('/', methods=['POST'])
 @login_required
-# processes an incoming *.fit file using FitCSVTool.jar. As result two *.csv files are available in the filesystem.
-# furthermore references to each of the csv files are stored in the mysql lite "db".
+# processes an incoming *.fit file using FitCSVTool.jar. As result two *.csv files are stored in the filesystem.
 def add_fitfile():
     if not os.path.exists(os.path.join(basedir, 'fitness')):
         os.makedirs(os.path.join(basedir, 'fitness'))
@@ -84,8 +83,9 @@ def add_fitfile():
     finally:
         if os.path.exists(tmp_path):
             os.remove(tmp_path)
-            activity_datetime = extract_ActivityDateTime(target_path + '.csv')
-            fitfile = models.FitFile('record_' + time.strftime("%d-%m-%Y-%H-%M-%S"), target_path + '_data.csv', current_user.id, activity_datetime)
+
+    activity_datetime = extract_ActivityDateTime(target_path + '.csv')
+    fitfile = models.FitFile('record_' + time.strftime("%d-%m-%Y-%H-%M-%S"), target_path + '_data.csv', current_user.id, activity_datetime)
     db.session.add(fitfile)
     db.session.commit()
 
@@ -129,10 +129,15 @@ def delete_fitfile(file_id):
     if fitfile not in current_user.fitfiles:
         return make_response('', 403)
 
-    # TODO: both csv files have to be deleted from filesystem and db.
+    # both csv files will be deleted from filesystem and db.
     path = os.path.join(basedir, 'fitness', fitfile.path + '_data.csv')
     if os.path.exists(path):
         os.remove(path)
+
+    path2 = os.path.join(basedir, 'fitness', fitfile.path + '.csv')
+    if os.path.exists(path2):
+        os.remove(path2)
+
     db.session.delete(fitfile)
     db.session.commit()
 
