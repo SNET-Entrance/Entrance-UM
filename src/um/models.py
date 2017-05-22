@@ -45,9 +45,11 @@ class Attribute(db.Model, Ext):
     display_name = db.Column(db.Text, nullable=False) # actual user input
     sys = db.Column(db.Boolean, nullable=False) # attribute with this set to True are not diplayed to users
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    activityDateTime = db.Column(db.Text, nullable=False, unique=True)
 
-    def __init__(self, display_name, sys, user_id):
+    def __init__(self, display_name, sys, user_id,activityDateTime):
         self.name = display_name.replace(' ', '_') # name is automatically generated
         self.display_name = display_name
         self.sys = sys
         self.user_id = user_id
+        self.activityDateTime =activityDateTime

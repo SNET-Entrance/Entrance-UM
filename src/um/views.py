@@ -338,7 +338,7 @@ def edit_attribute(attr_id):
 
     for user in users: # iterate through users again
         if user.id not in delete_errors:
-            user.attributes.remove(attr) # delete old attribute for successul contacts
+            user.attributes.remove(attr) # delete old attribute for successful contacts
         if user.id not in create_errors:
             user.attributes.append(attr_new) # create new attribute for successful contacts
         db.session.add(user)

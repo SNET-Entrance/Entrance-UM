@@ -2,8 +2,9 @@ import base64
 import json
 import csv
 import uuid
-import time
 import os
+import itertools
+import time
 from subprocess import call
 
 from flask import request, make_response
@@ -19,7 +20,6 @@ from fit import fit, models
 def get_fitfiles():
     fitfiles = models.FitFile.query.filter_by(user_id=current_user.id)
     return make_response(json.dumps([f.dict() for f in fitfiles], default=date_handler), 200)
-
 
 @fit.route('/<file_id>', methods=['GET'])
 @login_required
@@ -54,6 +54,8 @@ def get_fitfile(file_id):
 
 @fit.route('/', methods=['POST'])
 @login_required
+# processes an incoming *.fit file using FitCSVTool.jar. As result two *.csv files are available in the filesystem.
+# furthermore references to each of the csv files are stored in the mysql lite "db".
 def add_fitfile():
     if not os.path.exists(os.path.join(basedir, 'fitness')):
         os.makedirs(os.path.join(basedir, 'fitness'))
@@ -82,10 +84,8 @@ def add_fitfile():
     finally:
         if os.path.exists(tmp_path):
             os.remove(tmp_path)
-        if os.path.exists(target_path + '.csv'):
-            os.remove(target_path + '.csv')
-
-    fitfile = models.FitFile('record_' + time.strftime("%d-%m-%Y-%H-%M-%S"), target_path + '_data.csv', current_user.id)
+            activity_datetime = extract_ActivityDateTime(target_path + '.csv')
+            fitfile = models.FitFile('record_' + time.strftime("%d-%m-%Y-%H-%M-%S"), target_path + '_data.csv', current_user.id, activity_datetime)
     db.session.add(fitfile)
     db.session.commit()
 
@@ -125,13 +125,14 @@ def add_fitfile_admin():
 @login_required
 def delete_fitfile(file_id):
     fitfile = models.FitFile.query.filter_by(id=file_id).first_or_404()
+
     if fitfile not in current_user.fitfiles:
         return make_response('', 403)
 
+    # TODO: both csv files have to be deleted from filesystem and db.
     path = os.path.join(basedir, 'fitness', fitfile.path + '_data.csv')
     if os.path.exists(path):
         os.remove(path)
-
     db.session.delete(fitfile)
     db.session.commit()
 
@@ -139,3 +140,15 @@ def delete_fitfile(file_id):
 
 
 def date_handler(obj): return obj.isoformat() if hasattr(obj, 'isoformat') else obj
+
+def extract_ActivityDateTime(path):
+    # open file in read+binary mode
+    with open(path, 'rb') as file:
+        #dialect = csv.Sniffer().sniff(file.read(1024))
+        text_temp = next(itertools.islice(csv.reader(file), 2, 7))
+        t2 = int(text_temp[7])
+        t3 = 631065600 # dmttime since 1989 12 31 00:00:00
+        t4 = t3 + t2 # calculate true activity date and time
+        t5 =  time.strftime("%d-%m-%Y at %H-%M-%S", time.gmtime(t4)) # convert true activity date and time
+    return t5
+

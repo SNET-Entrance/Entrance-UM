@@ -44,8 +44,8 @@ user = User(
 db.session.add(user)
 
 user2 = User(
-    username='test',
-    password='$2a$12$Ou1onuD8TtnkyyKsDr7JPe53sabvcKElgd5La9DWUOBKrYDbk.jCy',
+    username='Testuser',
+    password='$2a$12$jhEA1aE3Vchn1DIOfK2Dien8HEVooaMMMBjd.VgJv3Pl6HVq1X62S',
     email='test@notavailable.org',
     confirmed_at=datetime.datetime.now(),
     active=True,

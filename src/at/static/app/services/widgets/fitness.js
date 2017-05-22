@@ -23,7 +23,8 @@ app.factory('FitnessService', function($http) {
                 distance: 0,
                 time: 0,
                 avgSpeed: 0,
-                calories: 0
+                calories: 0,
+                activityDateTime: record.activityDateTime
             };
 
             for (j = 0; j < record.records.length; j++) {

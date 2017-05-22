@@ -5,6 +5,7 @@ app.controller("FitnessController", function($scope, $controller, FitnessService
     $scope.resolution = 150;
     $scope.chartHeight = '150';
     $scope.currentRecord = 0;
+    $scope.activityDateTime = '';
 
     FitnessService.getRecords().success(function (data) {
         $scope.recordsLength = data.length;
@@ -22,10 +23,11 @@ app.controller("FitnessController", function($scope, $controller, FitnessService
                 $scope.recordName = $scope.activities[0].name;
                 $scope.recordDate = $scope.activities[0].date;
                 $scope.currentRecord = 0;
+                $scope.activityDateTime = $scope.activities[0].activityDateTime;
             }
         }
 
-        // console.log($scope.activities);
+         //console.log($scope.activities);
     }
 
     $scope.visualizeActivity = function(i) {
