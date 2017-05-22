@@ -57,7 +57,7 @@ db.session.commit()
 
 from um import models
 
-attr_all = models.Attribute(all_attr, True, user.id)
+attr_all = models.Attribute(all_attr, True, user.id,'')
 db.session.add(attr_all)
 db.session.commit()
 #db.session.flush()

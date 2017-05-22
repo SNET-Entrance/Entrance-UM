@@ -47,7 +47,7 @@ class Attribute(db.Model, Ext):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     activityDateTime = db.Column(db.Text, nullable=False, unique=True)
 
-    def __init__(self, display_name, sys, user_id,activityDateTime):
+    def __init__(self, display_name, sys, user_id, activityDateTime):
         self.name = display_name.replace(' ', '_') # name is automatically generated
         self.display_name = display_name
         self.sys = sys
