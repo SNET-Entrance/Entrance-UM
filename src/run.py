@@ -18,5 +18,6 @@ app.config['HAS_CONFIG'] = True
 except: 
 logging.warning('Can\'t load conf file')
 app.config['HAS_CONFIG'] = False
+finally:
 
 app.run(host='0.0.0.0')
