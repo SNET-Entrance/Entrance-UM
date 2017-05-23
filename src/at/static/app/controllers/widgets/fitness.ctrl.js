@@ -55,6 +55,8 @@ app.controller("FitnessController", function($scope, $controller, FitnessService
         $scope.recordName = $scope.activities[$scope.currentRecord].name;
         $scope.recordDate = $scope.activities[$scope.currentRecord].date;
         $scope.visualizeActivity($scope.currentRecord);
+        $scope.activityDateTime = $scope.activities[$scope.currentRecord].activityDateTime;
+
     };
 
     function initMap(i) {
