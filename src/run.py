@@ -1,5 +1,5 @@
 from bootstrap import app
-
+import logging
 #yourapp/__init__.py
 
 #app = __name__, instance_relative_config=True
@@ -12,6 +12,11 @@ from bootstrap import app
 
 # Load the file specified by the APP_CONFIG_FILE environment variable
 # Variables defined here will override those in the default configuration
+try:
 app.config.from_envvar('APP_CONFIG_FILE')
+app.config['HAS_CONFIG'] = True
+except: 
+logging.warning('Can\'t load conf file')
+app.config['HAS_CONFIG'] = False
 
 app.run(host='0.0.0.0')
