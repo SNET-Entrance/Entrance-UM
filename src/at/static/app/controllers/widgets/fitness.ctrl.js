@@ -36,8 +36,9 @@ app.controller("FitnessController", function($scope, $controller, FitnessService
 
         if ($scope.activities[i].coords.length > 0)
             initMap(i);
-
+        initChart(i, 'Pace', 'pace', 'pace', '#35b6f0', '#2d9acc', '#2a90bf');
         initChart(i, 'Heart Rate', 'heartrate', 'heartRate', '#ff2653', '#d92145', '#bf1d3d');
+        initChart(i, 'Altitude', 'altitude', 'altitude', '#34ff06', '#05d91c', '#07bf1c');
         initChart(i, 'Temperature', 'temperature', 'temperature', '#35b6f0', '#2d9acc', '#2a90bf');
     };
 

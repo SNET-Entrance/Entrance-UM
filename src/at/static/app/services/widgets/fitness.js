@@ -19,6 +19,8 @@ app.factory('FitnessService', function($http) {
                 sport: 0,
                 coords: [],
                 heartRate: [],
+                pace: [],
+                altitude: [],
                 temperature: [],
                 distance: 0,
                 time: 0,
@@ -39,7 +41,10 @@ app.factory('FitnessService', function($http) {
                     activity.sport = item.sport_sport;
 
                 if (item.record_heart_rate_bpm == null ||
-                    item.record_temperature_C == null)
+                    item.record_temperature_C == null ||
+                    item.record_altitude_m == null ||
+                    item.record_speed_m_s == null
+                )
                     continue;
 
                 // if (activity.sport == 2) {
@@ -51,8 +56,9 @@ app.factory('FitnessService', function($http) {
                     var lng = item.record_position_long_semicircles * (180 / Math.pow(2, 31));
                     activity.coords.push({lat: lat, lng: lng});
                 // }
-
+                activity.pace.push(item.record_speed_m_s);
                 activity.heartRate.push(item.record_heart_rate_bpm);
+                activity.altitude.push(item.record_altitude_m);
                 activity.temperature.push(item.record_temperature_C);
 
                 if (item.record_distance_m == null ||
