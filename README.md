@@ -23,4 +23,14 @@ Start the service:
 	
 Check whether a hidden ".entrance" directory in your home folder exists.
 
+# Login to the Dashboard using a test account: 
+Testuser:Test1234
 
+# Using an edugain account for login:
+ After
+ 
+ 1st. defining a login/password for a SMTP server in config/default.py
+ 
+ 2nd. creating a local account using your edugain-ready email address,
+ 
+ you can log into the Dashboard using your edugain credentials. Trigger the edugain login by clicking on the Cyclone logo at the login page.
