@@ -34,3 +34,6 @@ Testuser:Test1234
  2nd. creating a local account using your edugain-ready email address,
  
  you can log into the Dashboard using your edugain credentials. Trigger the edugain login by clicking on the Cyclone logo at the login page.
+
+# Dashboard Screenshot:
+![alt text](https://github.com/SNET-Entrance/Entrance-UM/blob/master/Screenshot_Dashboard.jpg)
