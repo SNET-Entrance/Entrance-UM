@@ -4,13 +4,13 @@ from setuptools import find_packages
 
 setup(
     name='entrance',
-    version='0.1',
+    version='0.2',
     packages=find_packages(),
     url='http://www.snet.tu-berlin.de/menue/projects/entrance/',
     license='GNU',
-    author='Philip Raschke',
-    author_email='philip.raschke@mailbox.tu-berlin.de',
+    author='Dirk Thatmann, Philip Raschke',
+    author_email='d.thatmann@tu-berlin.de, philip.raschke@mailbox.tu-berlin.de',
     description='entrance - Encryption Service Component UM/CM',
     install_requires=['Flask', 'flask-sqlalchemy', 'flask-bootstrap', 'flask-user', 'flask-mail', 'requests',
-                      'Flask-OAuthlib', 'beautifulsoup4', 'cssutils', 'html5lib']
+                      'Flask-OAuthlib', 'beautifulsoup4', 'cssutils', 'html5lib', 'oic', 'Flask-Cache']
 )

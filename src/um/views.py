@@ -2,12 +2,20 @@ import base64
 import json
 import sys
 
-from flask import request, make_response
+from flask import current_app, url_for
+from oic.oic import Client
+from oic.utils.authn.client import CLIENT_AUTHN_METHOD
+from oic import rndstr
+from oic.oic.message import AuthorizationResponse
+from oic.oic.message import RegistrationResponse
+
+from flask import request, make_response, redirect
 from flask_user import login_required, current_user
+from flask_login import login_user
 from sqlalchemy import exc
 
 from bootstrap import db, all_attr
-from bootstrap.models import AttrAuth
+from bootstrap.models import AttrAuth, User
 from cm.models import Policy
 from um import um, models
 
@@ -16,25 +24,25 @@ from um import um, models
 @login_required
 def show_users():
     out = list()
-    for user in models.Contact.query.filter_by(user_id=current_user.id).all(): # load all contacts of a user
+    for user in models.Contact.query.filter_by(user_id=current_user.id).all():  # load all contacts of a user
         tmp = user.dict()
         tmp['properties'] = [p.dict() for p in user.properties]
         tmp['attributes'] = [a.dict() for a in user.attributes if not a.sys]
         out.append(tmp)
 
-    return make_response(json.dumps(out), 200) # and JSON serialize it
+    return make_response(json.dumps(out), 200)  # and JSON serialize it
 
 
 @um.route('', methods=['POST'])
 @login_required
-def add_user(): # this adds a new contact for a logged-in user
+def add_user():  # this adds a new contact for a logged-in user
     data = json.JSONDecoder().decode(request.data)
     if 'name' not in data or 'email' not in data:
-        return make_response('', 400) # error missing parameters
+        return make_response('', 400)  # error missing parameters
 
     user = models.Contact(data['name'], data['email'], current_user.id)
     db.session.add(user)
-    db.session.commit() # otherwise store contact persistently
+    db.session.commit()  # otherwise store contact persistently
 
     attr_id = models.Attribute(user.identity, False, current_user.id)
     attr_id.display_name = user.name
@@ -43,36 +51,142 @@ def add_user(): # this adds a new contact for a logged-in user
     db.session.add(attr_all)
     db.session.commit()
 
-    user.attributes.append(attr_id) # assign identity attribute to contact
-    user.attributes.append(attr_all) # assign all attribtue to contact
+    user.attributes.append(attr_id)  # assign identity attribute to contact
+    user.attributes.append(attr_all)  # assign all attribtue to contact
     db.session.add(user)
     db.session.commit()
 
-
-    aa_response = AttrAuth.add_user(user) # inform AA about created user
+    aa_response = AttrAuth.add_user(user)  # inform AA about created user
     if aa_response is None:
-        db.session.delete(user) # delete user in error case
+        db.session.delete(user)  # delete user in error case
         db.session.commit()
-
 
         return make_response('', 500)
 
-    user.secret_key = aa_response['secretSeed'] # the AA currently responds with the secret seed not the secret key
+    user.secret_key = aa_response['secretSeed']  # the AA currently responds with the secret seed not the secret key
 
-    aa_response = AttrAuth.add_attr(user, attr_id, current_user) # inform AA about identity AA
+    aa_response = AttrAuth.add_attr(user, attr_id, current_user)  # inform AA about identity AA
     if aa_response is None:
-        db.session.delete(attr_id) # delete it in error case
+        db.session.delete(attr_id)  # delete it in error case
         db.session.commit()
         return make_response('', 500)
 
-    aa_response = AttrAuth.add_attr(user, attr_all, current_user) # inform AA about all attribute
+    aa_response = AttrAuth.add_attr(user, attr_all, current_user)  # inform AA about all attribute
     if aa_response is None:
-        db.session.delete(attr_all) # delete in error case
+        db.session.delete(attr_all)  # delete in error case
         db.session.commit()
         return make_response('', 500)
 
     return make_response(json.dumps(user.dict()), 201)
 
+
+# TODO: Load from CONFIG file
+DEFAULT_CALLBACK_PATH = 'contacts/oidc/callback'
+HOST = 'localhost:5000'  # This host's name
+CLIENT_SECRET = '00e4a5f3-fb85-4a5e-be9e-cd77e1c48115'  # Client Secret
+CLIENT_ID = 'pamtest'  # Client ID
+REALM = 'master'  # Keycloak realm
+OIDC_HOST = 'https://federation.cyclone-project.eu'  # Keycloak host
+
+# Generate some static variables
+OIDC_INFO_URL = '{:s}/auth/realms/{:s}/'.format(OIDC_HOST, REALM)
+OIDC_REDIRECT_URI = 'http://{:s}/{:s}'.format(HOST, DEFAULT_CALLBACK_PATH)
+
+
+@um.route('/oidc/login', methods=['GET'])
+def oidc_login():
+    state = rndstr()
+    nonce = rndstr()
+    client = Client(client_authn_method=CLIENT_AUTHN_METHOD)
+
+    client.provider_config(OIDC_INFO_URL)
+
+    info = {
+        "client_id": CLIENT_ID,
+        "client_secret": CLIENT_SECRET
+    }
+    client_reg = RegistrationResponse(**info)
+    client.store_registration_info(client_reg)
+
+    args = {
+        "client_id": client.client_id,
+        "response_type": "code",
+        "scope": ["openid"],
+        "nonce": nonce,
+        "redirect_uri": OIDC_REDIRECT_URI,
+        "state": state
+    }
+
+    auth_req = client.construct_AuthorizationRequest(request_args=args)
+    login_url = auth_req.request(client.authorization_endpoint)
+
+    # Save in cache Key: state => Value: nonce
+    current_app.cache.set(state, nonce)
+
+    return redirect(login_url, 303)
+
+
+@um.route('/oidc/callback', methods=['POST', 'GET'])
+def oidc_callback():
+    # Instantiate again the client
+
+    client = Client(client_authn_method=CLIENT_AUTHN_METHOD)
+    info = {
+        "client_id": CLIENT_ID,
+        "client_secret": CLIENT_SECRET
+    }
+    client_reg = RegistrationResponse(**info)
+    client.store_registration_info(client_reg)
+
+    args = {
+        "client_id": client.client_id,
+        "response_type": "code",
+        "scope": ["openid"],
+        "redirect_uri": OIDC_REDIRECT_URI,
+    }
+
+    auth_req = client.construct_AuthorizationRequest(request_args=args)
+    client.provider_config(OIDC_INFO_URL)
+
+    # Posted information
+    query_string = request.url
+    auth_response = client.parse_response(AuthorizationResponse,
+                                          info=query_string,
+                                          sformat="urlencoded")
+
+    # We need to find a state/nonce pair that matches what we have
+    nonce = current_app.cache.get(auth_response['state'])
+    current_app.cache.delete(auth_response['state'])
+
+    if "id_token" in auth_response and auth_response["id_token"]["nonce"] != nonce:
+        return make_response('', 500)
+
+    # Request an access token an use it to require the user's information
+    args = {
+        "code": auth_response["code"]
+    }
+
+    client.do_access_token_request(state=auth_response["state"],
+                                   request_args=args,
+                                   authn_method="client_secret_basic")
+
+    # This is the object with the user info
+    user_info = client.do_user_info_request(state=auth_response["state"])
+
+    # Take the mail depending on the attribute they have saved it in
+    mail = user_info[u'mail']
+    if not mail:
+        mail = user_info[u'email']
+
+    # Validate that the user mail is in the DB
+    user = User.query.filter_by(email=mail).first()
+    if user is None:
+        return make_response('Unauthorized user', 401)
+
+    # Login the user and return
+    login_user(user, remember=True)
+
+    return redirect(url_for('welcome'))
 
 @um.route('/<user_id>', methods=['GET'])
 @login_required
@@ -255,7 +369,8 @@ def show_attributes():
 @um.route('/filter/attributes', methods=['POST'])
 @login_required
 def filter_attributes():
-    attrs = models.Attribute.query.filter(models.Attribute.display_name.like('%'+request.data+'%')).filter(models.Attribute.user_id==current_user.id).filter(models.Attribute.sys==False).all()
+    attrs = models.Attribute.query.filter(models.Attribute.display_name.like('%' + request.data + '%')).filter(
+        models.Attribute.user_id == current_user.id).filter(models.Attribute.sys == False).all()
     return make_response(json.dumps([a.dict() for a in attrs]), 200)
 
 
@@ -315,32 +430,32 @@ def edit_attribute(attr_id):
     users = models.Contact.query.filter(models.Contact.attributes.contains(attr)).all()
     delete_errors = list()
     create_errors = list()
-    for user in users: # iterate through contacts
-        aa_response = AttrAuth.delete_attr(user, attr, current_user) # delete wave
+    for user in users:  # iterate through contacts
+        aa_response = AttrAuth.delete_attr(user, attr, current_user)  # delete wave
         if aa_response is None:
-            delete_errors.append(user.id) # in error case remember faulty contacts
+            delete_errors.append(user.id)  # in error case remember faulty contacts
 
-        aa_response = AttrAuth.add_attr(user, data['name'], current_user) # create wave
+        aa_response = AttrAuth.add_attr(user, data['name'], current_user)  # create wave
         if aa_response is None:
-            create_errors.append(user.id) # in error case remember faulty contacts
+            create_errors.append(user.id)  # in error case remember faulty contacts
 
-    if len(delete_errors) == 0 and len(create_errors) == 0: # case no errors in wave
+    if len(delete_errors) == 0 and len(create_errors) == 0:  # case no errors in wave
         db.session.delete(attr_new)
         db.session.commit()
         attr.name = attr_new.name
         db.session.add(attr)
         db.session.commit()
-        return make_response(json.dumps(attr.dict()), 200) # success
+        return make_response(json.dumps(attr.dict()), 200)  # success
 
-    if len(users) == len(create_errors): # case create wave not successfull for any user
-        db.session.delete(attr_new) # delete the new attribute
-        db.session.commit() # at least state is consistent
+    if len(users) == len(create_errors):  # case create wave not successfull for any user
+        db.session.delete(attr_new)  # delete the new attribute
+        db.session.commit()  # at least state is consistent
 
-    for user in users: # iterate through users again
+    for user in users:  # iterate through users again
         if user.id not in delete_errors:
-            user.attributes.remove(attr) # delete old attribute for successful contacts
+            user.attributes.remove(attr)  # delete old attribute for successful contacts
         if user.id not in create_errors:
-            user.attributes.append(attr_new) # create new attribute for successful contacts
+            user.attributes.append(attr_new)  # create new attribute for successful contacts
         db.session.add(user)
     db.session.commit()
 
@@ -367,7 +482,7 @@ def delete_attribute(attr_id):
         if aa_response is None:
             delete_errors.append(user.id)
 
-    if len(delete_errors) == 0: # analogous error handling
+    if len(delete_errors) == 0:  # analogous error handling
         db.session.delete(attr)
         db.session.commit()
         return make_response('', 200)
@@ -393,30 +508,30 @@ def assign_new_attribute(user_id):
     if 'name' not in data:
         return make_response('', 400)
 
-    attr = models.Attribute(data['name'], False, current_user.id) # instantiate attribute
+    attr = models.Attribute(data['name'], False, current_user.id)  # instantiate attribute
     db.session.add(attr)
     try:
-        db.session.commit() # try to commit
-    except exc.IntegrityError: # in case attribute already exists
+        db.session.commit()  # try to commit
+    except exc.IntegrityError:  # in case attribute already exists
         db.session.rollback()
-        attr = models.Attribute.query.filter_by(display_name=data['name']).first() # use the existent one
-        if attr in user.attributes: # if attribute already assigned - notify user
+        attr = models.Attribute.query.filter_by(display_name=data['name']).first()  # use the existent one
+        if attr in user.attributes:  # if attribute already assigned - notify user
             return make_response('', 409)
 
     # else ...
-    aa_response = AttrAuth.add_attr(user, attr, current_user) # inform AA
+    aa_response = AttrAuth.add_attr(user, attr, current_user)  # inform AA
     if aa_response is None:
-        db.session.delete(attr) # error case - delete attribute
+        db.session.delete(attr)  # error case - delete attribute
         db.session.commit()
-        return make_response('', 500) # and inform user
+        return make_response('', 500)  # and inform user
 
-    user.attributes.append(attr) # otherwise assign it to contact
+    user.attributes.append(attr)  # otherwise assign it to contact
     db.session.add(user)
     db.session.commit()
 
-    Policy.check_for(user, current_user) # depending on the enforcement strategy - reevaluate all container
+    Policy.check_for(user, current_user)  # depending on the enforcement strategy - reevaluate all container
 
-    return make_response(json.dumps(attr.dict()), 200) # success
+    return make_response(json.dumps(attr.dict()), 200)  # success
 
 
 @um.route('/<user_id>/attributes/<attr_id>', methods=['POST'])
@@ -439,7 +554,7 @@ def assign_attribute(user_id, attr_id):
     db.session.add(user)
     db.session.commit()
 
-    Policy.check_for(user, current_user) # involves reevaluation
+    Policy.check_for(user, current_user)  # involves reevaluation
 
     return make_response('', 200)
 
@@ -465,6 +580,6 @@ def dissociate_attribute(user_id, attr_id):
     db.session.add(user)
     db.session.commit()
 
-    Policy.check_for(user, current_user) # involves reevaluation
+    Policy.check_for(user, current_user)  # involves reevaluation
 
     return make_response('', 200)

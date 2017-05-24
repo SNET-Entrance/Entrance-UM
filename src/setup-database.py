@@ -38,6 +38,7 @@ user = User(
     password='$2a$12$Ou1onuD8TtnkyyKsDr7JPe53sabvcKElgd5La9DWUOBKrYDbk.jCy',
     email='philip.raschke@outlook.com',
     confirmed_at=datetime.datetime.now(),
+    logged_in_edugain=False,
     active=True,
     pages='[{"widgets": [], "name": "My Dashboard", "slug": "my-dashboard"}]'
 )
@@ -48,10 +49,33 @@ user2 = User(
     password='$2a$12$jhEA1aE3Vchn1DIOfK2Dien8HEVooaMMMBjd.VgJv3Pl6HVq1X62S',
     email='test@notavailable.org',
     confirmed_at=datetime.datetime.now(),
+    logged_in_edugain=False,
     active=True,
     pages='[{"widgets": [], "name": "My Dashboard", "slug": "my-dashboard"}]'
 )
 db.session.add(user2)
+
+user3 = User(
+    username='dthatmann',
+    password='$2a$12$jhEA1aE3Vchn1DIOfK2Dien8HEVooaMMMBjd.VgJv3Pl6HVq1X62S',
+    email='d.thatmann@tu-berlin.de',
+    confirmed_at=datetime.datetime.now(),
+    logged_in_edugain=False,
+    active=True,
+    pages='[{"widgets": [], "name": "My Dashboard", "slug": "my-dashboard"}]'
+)
+db.session.add(user3)
+
+user4 = User(
+    username='jduver',
+    password='$2a$12$jhEA1aE3Vchn1DIOfK2Dien8HEVooaMMMBjd.VgJv3Pl6HVq1X62S',
+    email='jonas.duever@campus.tu-berlin.de',
+    confirmed_at=datetime.datetime.now(),
+    logged_in_edugain=False,
+    active=True,
+    pages='[{"widgets": [], "name": "My Dashboard", "slug": "my-dashboard"}]'
+)
+db.session.add(user4)
 
 db.session.commit()
 

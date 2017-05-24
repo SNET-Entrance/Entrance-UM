@@ -32,6 +32,9 @@ class User(db.Model, UserMixin):
     first_name = db.Column(db.String(100), nullable=False, server_default='')
     last_name = db.Column(db.String(100), nullable=False, server_default='')
 
+    # edugain /cyclone toggle
+    logged_in_edugain = db.Column('is_edugain', db.Boolean(), nullable=False, server_default='0')
+
     # children of a user
     contacts = db.relationship('Contact', backref='user', cascade='all, delete-orphan', lazy='joined')
     attributes = db.relationship('Attribute', backref='user', cascade='all, delete-orphan', lazy='joined')

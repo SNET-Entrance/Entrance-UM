@@ -6,7 +6,9 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_user import SQLAlchemyAdapter, UserManager
 from flask_user.signals import user_registered
 from flask_login import LoginManager
+from flask_cache import Cache
 from flask_bootstrap import Bootstrap
+
 import jinja2
 
 app = Flask(__name__)
@@ -36,6 +38,9 @@ mail = Mail(app)
 Bootstrap(app)
 login_manager = LoginManager()
 login_manager.init_app(app)
+
+# Initialize Cache
+app.cache = Cache(app, config={'CACHE_TYPE': 'simple'})
 
 # initialize components
 from models import User
