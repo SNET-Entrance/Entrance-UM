@@ -11,6 +11,17 @@ setup(
     author='Philip Raschke',
     author_email='philip.raschke@mailbox.tu-berlin.de',
     description='entrance - Encryption Service Component UM/CM',
-    install_requires=['Flask', 'flask-sqlalchemy', 'flask-bootstrap', 'flask-user', 'flask-mail', 'requests',
-                      'Flask-OAuthlib', 'beautifulsoup4', 'cssutils', 'html5lib']
+    install_requires=[
+        'Flask',
+        'flask-sqlalchemy',
+        'flask-bootstrap',
+        'flask-user',
+        'flask-mail',
+        'requests',
+        'Flask-OAuthlib',
+        'beautifulsoup4',
+        'cssutils',
+        'html5lib',
+        'oidc'
+    ]
 )

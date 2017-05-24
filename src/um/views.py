@@ -1,9 +1,15 @@
 import base64
 import json
 import sys
+from oic.oic import Client
+from oic.utils.authn.client import CLIENT_AUTHN_METHOD
+from oic import rndstr
+from oic.oic.message import AuthorizationResponse
+from oic.oic.message import RegistrationResponse
 
 from flask import request, make_response
 from flask_user import login_required, current_user
+from flask_login import login_user
 from sqlalchemy import exc
 
 from bootstrap import db, all_attr
@@ -468,3 +474,85 @@ def dissociate_attribute(user_id, attr_id):
     Policy.check_for(user, current_user) # involves reevaluation
 
     return make_response('', 200)
+
+
+@um.route('/oidc/login', methods=['GET'])
+def oidc_login():
+
+    # Needed configuration (Load from CONFIG file)
+    DEFAULT_CALLBACK_PATH = '/oidc/callback/'
+    host = 'localhost:5000'  # This host's name
+    client_secret = '00e4a5f3-fb85-4a5e-be9e-cd77e1c48115'  # Client Secret
+    client_id = 'pamtest'  # Client ID
+    realm = 'master'  # Keycloak realm
+    oidc_host = 'https://federation.cyclone-project.eu'  # Keycloak host
+
+    # Generate some static variables
+    oidc_info_url = '{:s}/auth/realms/{:s}/'.format(oidc_host, realm)
+    redirect_uri = 'http://{:s}/{:s}'.format(host, DEFAULT_CALLBACK_PATH)
+    state = rndstr()
+    nonce = rndstr()
+    client = Client(client_authn_method=CLIENT_AUTHN_METHOD)
+
+    client.provider_config(oidc_info_url)
+
+    info = {
+        "client_id": client_id,
+        "client_secret": client_secret
+    }
+    client_reg = RegistrationResponse(**info)
+    client.store_registration_info(client_reg)
+
+    args = {
+        "client_id": client.client_id,
+        "response_type": "code",
+        "scope": ["openid"],
+        "nonce": nonce,
+        "redirect_uri": redirect_uri,
+        "state": state
+    }
+
+    auth_req = client.construct_AuthorizationRequest(request_args=args)
+    login_url = auth_req.request(client.authorization_endpoint)
+
+    return login_url
+
+
+@um.route('/oidc/callback', methods=['POST'])
+def oidc_callback():
+
+    # Instantiate again the client
+    client = Client(client_authn_method=CLIENT_AUTHN_METHOD)
+    query_string = request.data  #Posted information
+    auth_response = client.parse_response(AuthorizationResponse,
+                                               info=query_string,
+                                               sformat="urlencoded")
+
+    state = state  # Get state from mapping
+    nonce = nonce  # Get nonce from mapping
+
+    # We need to find a state/nonce pair that matches what we have
+    if auth_response['state'] != state:
+        return False
+
+    if "id_token" in auth_response and auth_response["id_token"]["nonce"] != nonce:
+        return False
+
+    # Request an access token an use it to require the user's information
+    args = {
+        "code": auth_response["code"]
+    }
+
+    client.do_access_token_request(state=auth_response["state"],
+                                        request_args=args,
+                                        authn_method="client_secret_basic")
+
+    # This is the object with the user info
+    user_info = client.do_user_info_request(state=auth_response["state"])
+
+    # Validate that the user mail is in the DB
+    user = db.session.finduserviamail(user_info['mail'])
+
+    # Login the user and return
+    login_user(user, remember=True)
+
