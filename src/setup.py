@@ -22,6 +22,9 @@ setup(
         'beautifulsoup4',
         'cssutils',
         'html5lib',
-        'oidc'
+        'oidc',
+        'Flask-Cache',
+        'flask-login',
+        'sqlalchemy'
     ]
 )

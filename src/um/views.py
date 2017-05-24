@@ -1,6 +1,8 @@
 import base64
 import json
 import sys
+
+from flask_cache import Cache
 from oic.oic import Client
 from oic.utils.authn.client import CLIENT_AUTHN_METHOD
 from oic import rndstr
@@ -475,30 +477,30 @@ def dissociate_attribute(user_id, attr_id):
 
     return make_response('', 200)
 
+# TODO: Load from CONFIG file
+DEFAULT_CALLBACK_PATH = '/oidc/callback/'
+HOST = 'localhost:5000'  # This host's name
+CLIENT_SECRET = '00e4a5f3-fb85-4a5e-be9e-cd77e1c48115'  # Client Secret
+CLIENT_ID = 'pamtest'  # Client ID
+REALM = 'master'  # Keycloak realm
+OIDC_HOST = 'https://federation.cyclone-project.eu'  # Keycloak host
+
+# Generate some static variables
+OIDC_INFO_URL = '{:s}/auth/realms/{:s}/'.format(OIDC_HOST, REALM)
+OIDC_REDIRECT_URI = 'http://{:s}/{:s}'.format(HOST, DEFAULT_CALLBACK_PATH)
+
 
 @um.route('/oidc/login', methods=['GET'])
 def oidc_login():
-
-    # Needed configuration (Load from CONFIG file)
-    DEFAULT_CALLBACK_PATH = '/oidc/callback/'
-    host = 'localhost:5000'  # This host's name
-    client_secret = '00e4a5f3-fb85-4a5e-be9e-cd77e1c48115'  # Client Secret
-    client_id = 'pamtest'  # Client ID
-    realm = 'master'  # Keycloak realm
-    oidc_host = 'https://federation.cyclone-project.eu'  # Keycloak host
-
-    # Generate some static variables
-    oidc_info_url = '{:s}/auth/realms/{:s}/'.format(oidc_host, realm)
-    redirect_uri = 'http://{:s}/{:s}'.format(host, DEFAULT_CALLBACK_PATH)
     state = rndstr()
     nonce = rndstr()
     client = Client(client_authn_method=CLIENT_AUTHN_METHOD)
 
-    client.provider_config(oidc_info_url)
+    client.provider_config(OIDC_INFO_URL)
 
     info = {
-        "client_id": client_id,
-        "client_secret": client_secret
+        "client_id": CLIENT_ID,
+        "client_secret": CLIENT_SECRET
     }
     client_reg = RegistrationResponse(**info)
     client.store_registration_info(client_reg)
@@ -508,32 +510,34 @@ def oidc_login():
         "response_type": "code",
         "scope": ["openid"],
         "nonce": nonce,
-        "redirect_uri": redirect_uri,
+        "redirect_uri": OIDC_REDIRECT_URI,
         "state": state
     }
 
     auth_req = client.construct_AuthorizationRequest(request_args=args)
     login_url = auth_req.request(client.authorization_endpoint)
 
+    # Save in cache Key: state => Value: nonce
+    Cache.set(state, nonce)
+
     return login_url
 
 
 @um.route('/oidc/callback', methods=['POST'])
 def oidc_callback():
-
     # Instantiate again the client
     client = Client(client_authn_method=CLIENT_AUTHN_METHOD)
-    query_string = request.data  #Posted information
-    auth_response = client.parse_response(AuthorizationResponse,
-                                               info=query_string,
-                                               sformat="urlencoded")
+    client.provider_config(OIDC_INFO_URL)
 
-    state = state  # Get state from mapping
-    nonce = nonce  # Get nonce from mapping
+    # Posted information
+    query_string = request.data
+    auth_response = client.parse_response(AuthorizationResponse,
+                                          info=query_string,
+                                          sformat="urlencoded")
 
     # We need to find a state/nonce pair that matches what we have
-    if auth_response['state'] != state:
-        return False
+    nonce = Cache.get(auth_response['state'])
+    Cache.delete(auth_response['state'])
 
     if "id_token" in auth_response and auth_response["id_token"]["nonce"] != nonce:
         return False
@@ -544,15 +548,21 @@ def oidc_callback():
     }
 
     client.do_access_token_request(state=auth_response["state"],
-                                        request_args=args,
-                                        authn_method="client_secret_basic")
+                                   request_args=args,
+                                   authn_method="client_secret_basic")
 
     # This is the object with the user info
     user_info = client.do_user_info_request(state=auth_response["state"])
 
+    # Take the mail depending on the attribute they have saved it in
+    mail = user_info[u'mail']
+    if not mail:
+        mail = user_info[u'email']
+
     # Validate that the user mail is in the DB
-    user = db.session.finduserviamail(user_info['mail'])
+    user = db.session.finduserviamail(mail)
 
     # Login the user and return
     login_user(user, remember=True)
 
+    return True
