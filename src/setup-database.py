@@ -77,6 +77,17 @@ user4 = User(
 )
 db.session.add(user4)
 
+user5 = User(
+    username='iwailo',
+    password='$2a$12$jhEA1aE3Vchn1DIOfK2Dien8HEVooaMMMBjd.VgJv3Pl6HVq1X62S',
+    email='iwailo.denisow@campus.tu-berlin.de',
+    confirmed_at=datetime.datetime.now(),
+    logged_in_edugain=False,
+    active=True,
+    pages='[{"widgets": [], "name": "My Dashboard", "slug": "my-dashboard"}]'
+)
+db.session.add(user5)
+
 db.session.commit()
 
 from um import models
