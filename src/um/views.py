@@ -14,10 +14,21 @@ from flask_user import login_required, current_user
 from flask_login import login_user
 from sqlalchemy import exc
 
-from bootstrap import db, all_attr
+# from bootstrap import db
+# from bootstrap.models import User
+from bootstrap import db, all_attr, CLIENT_ID, CLIENT_SECRET, OIDC_INFO_URL, OIDC_REDIRECT_URI
 from bootstrap.models import AttrAuth, User
 from cm.models import Policy
 from um import um, models
+
+#DEFAULT_CALLBACK_PATH = current_app.config['DEFAULT_CALLBACK_PATH']
+#HOST = current_app.config['HOST']  # This host's name
+#CLIENT_SECRET = current_app.config['CLIENT_SECRET']  # Client Secret
+#CLIENT_ID = current_app.config['CLIENT_ID']  # Client ID
+#REALM = current_app.config['REALM']  # Keycloak realm
+#OIDC_HOST = current_app.config['OIDC_HOST']  # Keycloak host
+#OIDC_INFO_URL = current_app.config['OIDC_INFO_URL']
+#OIDC_REDIRECT_URI = current_app.config['OIDC_REDIRECT_URI']
 
 
 @um.route('', methods=['GET'])
@@ -78,19 +89,6 @@ def add_user():  # this adds a new contact for a logged-in user
         return make_response('', 500)
 
     return make_response(json.dumps(user.dict()), 201)
-
-
-# TODO: Load from CONFIG file
-DEFAULT_CALLBACK_PATH = 'contacts/oidc/callback'
-HOST = '134.158.75.198:20000'  # This host's name
-CLIENT_SECRET = '00e4a5f3-fb85-4a5e-be9e-cd77e1c48115'  # Client Secret
-CLIENT_ID = 'pamtest'  # Client ID
-REALM = 'master'  # Keycloak realm
-OIDC_HOST = 'https://federation.cyclone-project.eu'  # Keycloak host
-
-# Generate some static variables
-OIDC_INFO_URL = '{:s}/auth/realms/{:s}/'.format(OIDC_HOST, REALM)
-OIDC_REDIRECT_URI = 'http://{:s}/{:s}'.format(HOST, DEFAULT_CALLBACK_PATH)
 
 
 @um.route('/oidc/login', methods=['GET'])
@@ -187,6 +185,7 @@ def oidc_callback():
     login_user(user, remember=True)
 
     return redirect(url_for('welcome'))
+
 
 @um.route('/<user_id>', methods=['GET'])
 @login_required

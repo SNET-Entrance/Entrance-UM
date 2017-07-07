@@ -39,6 +39,16 @@ Bootstrap(app)
 login_manager = LoginManager()
 login_manager.init_app(app)
 
+DEFAULT_CALLBACK_PATH = app.config['DEFAULT_CALLBACK_PATH']
+HOST = app.config['HOST']  # This host's name
+CLIENT_SECRET = app.config['CLIENT_SECRET']  # Client Secret
+CLIENT_ID = app.config['CLIENT_ID']  # Client ID
+REALM = app.config['REALM']  # Keycloak realm
+OIDC_HOST = app.config['OIDC_HOST']  # Keycloak host
+OIDC_INFO_URL = '{:s}/auth/realms/{:s}/'.format(OIDC_HOST, REALM)
+OIDC_REDIRECT_URI = 'http://{:s}/{:s}'.format(HOST, DEFAULT_CALLBACK_PATH)
+
+
 # Initialize Cache
 app.cache = Cache(app, config={'CACHE_TYPE': 'simple'})
 

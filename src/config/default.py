@@ -37,3 +37,11 @@ MAIL_USE_SSL = True
 MAIL_USE_TLS = False
 
 OAUTH2_PROVIDER_TOKEN_EXPIRES_IN = 31536000
+
+# openIDconnect
+DEFAULT_CALLBACK_PATH = 'contacts/oidc/callback'
+HOST = 'localhost:20000'  # This host's name
+CLIENT_SECRET = '00e4a5f3-fb85-4a5e-be9e-cd77e1c48115'  # Client Secret
+CLIENT_ID = 'pamtest'  # Client ID
+REALM = 'master'  # Keycloak realm
+OIDC_HOST = 'https://federation.cyclone-project.eu'  # Keycloak host
