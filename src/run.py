@@ -16,9 +16,9 @@ try:
     app.config.from_envvar('APP_CONFIG_FILE')
     app.config['HAS_CONFIG'] = True
     logging.warning('SUCCESSFUL: Config has been loaded from enviroment variables')
-    app.run(host='0.0.0.0')
+    app.run(host='0.0.0.0', port=int("20000"))
 except: 
     logging.warning('Can\'t load conf from enviroment variables')
 finally:
     app.config.from_object('config.default')
-    app.run(host='0.0.0.0')
+    app.run(host='0.0.0.0', port=int("20000"))

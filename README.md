@@ -24,6 +24,7 @@ Start the service:
 Check whether a hidden ".entrance" directory in your home folder exists.
 
 # Login to the Dashboard using a test account: 
+Dashboard url: http://localhost:20000
 Testuser:Test1234
 
 # Using an edugain account for login:

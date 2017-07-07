@@ -2,7 +2,7 @@ from const import basedir
 import os
 
 ATTRIBUTE_AUTHORITY_URL = 'http://localhost:8095'
-KEY_EXCHANGE_URL = 'http://localhost:5001'
+KEY_EXCHANGE_URL = 'http://localhost:20001'
 
 CONTAINER_EXTENSION = '.media'
 ALL_ATTRIBUTE = 'All'

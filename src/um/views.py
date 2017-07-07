@@ -82,7 +82,7 @@ def add_user():  # this adds a new contact for a logged-in user
 
 # TODO: Load from CONFIG file
 DEFAULT_CALLBACK_PATH = 'contacts/oidc/callback'
-HOST = 'localhost:5000'  # This host's name
+HOST = 'localhost:20000'  # This host's name
 CLIENT_SECRET = '00e4a5f3-fb85-4a5e-be9e-cd77e1c48115'  # Client Secret
 CLIENT_ID = 'pamtest'  # Client ID
 REALM = 'master'  # Keycloak realm
