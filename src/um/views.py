@@ -21,16 +21,6 @@ from bootstrap.models import AttrAuth, User
 from cm.models import Policy
 from um import um, models
 
-#DEFAULT_CALLBACK_PATH = current_app.config['DEFAULT_CALLBACK_PATH']
-#HOST = current_app.config['HOST']  # This host's name
-#CLIENT_SECRET = current_app.config['CLIENT_SECRET']  # Client Secret
-#CLIENT_ID = current_app.config['CLIENT_ID']  # Client ID
-#REALM = current_app.config['REALM']  # Keycloak realm
-#OIDC_HOST = current_app.config['OIDC_HOST']  # Keycloak host
-#OIDC_INFO_URL = current_app.config['OIDC_INFO_URL']
-#OIDC_REDIRECT_URI = current_app.config['OIDC_REDIRECT_URI']
-
-
 @um.route('', methods=['GET'])
 @login_required
 def show_users():
