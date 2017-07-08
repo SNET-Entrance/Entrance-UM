@@ -1,13 +1,17 @@
 from const import basedir
 import os
 import socket
+import fcntl
+import struct
 
-
-
-def get_ip_address():
+def get_ip_address(ifname):
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    s.connect(("8.8.8.8", 80))
-    return s.getsockname()[0]
+    return socket.inet_ntoa(fcntl.ioctl(
+        s.fileno(),
+        0x8915,  # SIOCGIFADDR
+        struct.pack('256s', ifname[:15])
+    )[20:24])
+
 
 ATTRIBUTE_AUTHORITY_URL = 'http://localhost:8095'
 KEY_EXCHANGE_URL = 'http://localhost:20001'
@@ -49,13 +53,12 @@ OAUTH2_PROVIDER_TOKEN_EXPIRES_IN = 31536000
 # openIDconnect
 DEFAULT_CALLBACK_PATH = 'contacts/oidc/callback'
 
-hostname=socket.gethostname()
-IPAddr=socket.gethostbyname(hostname)
-IPAddr2= get_ip_address()
+#hostname=socket.gethostname()
+#IPAddr=socket.gethostbyname(hostname)
+IPAddr2= get_ip_address('ens')
 
 HOST = IPAddr2+':20000'  # This service port
 CLIENT_SECRET = '00e4a5f3-fb85-4a5e-be9e-cd77e1c48115'  # Client Secret
 CLIENT_ID = 'pamtest'  # Client ID
 REALM = 'master'  # Keycloak realm
 OIDC_HOST = 'https://federation.cyclone-project.eu'  # Keycloak host
-
