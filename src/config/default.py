@@ -5,13 +5,13 @@ import fcntl
 import struct
 
 
-#def get_ip_address(ifname):
-#    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-#    return socket.inet_ntoa(fcntl.ioctl(
-#        s.fileno(),
-#        0x8915,  # SIOCGIFADDR
-#        struct.pack('256s', ifname[:15])
-#    )[20:24])
+def get_ip_address(ifname):
+    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    return socket.inet_ntoa(fcntl.ioctl(
+        s.fileno(),
+        0x8915,  # SIOCGIFADDR
+        struct.pack('256s', ifname[:15])
+    )[20:24])
 
 
 #def get_ip_address2():
@@ -62,9 +62,9 @@ DEFAULT_CALLBACK_PATH = 'contacts/oidc/callback'
 
 #hostname=socket.gethostname()
 #IPAddr=get_ip_address2()
-#IPAddr2= get_ip_address('ens3')
+IPAddr2= get_ip_address('ens3')
 
-HOST = '0.0.0.0:20000'  # This service port
+HOST = IPAddr2 +':20000'  # This service port
 CLIENT_SECRET = '00e4a5f3-fb85-4a5e-be9e-cd77e1c48115'  # Client Secret
 CLIENT_ID = 'pamtest'  # Client ID
 REALM = 'master'  # Keycloak realm
