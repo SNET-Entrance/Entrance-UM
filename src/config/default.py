@@ -1,24 +1,13 @@
 from const import basedir
 import os
 import socket
-import fcntl
-import struct
+import re
 
+def get_ip_address3():
+return [l for l in ([ip for ip in socket.gethostbyname_ex(socket.gethostname())[2] if not ip.startswith("127.")][:1], [[(s.connect(('8.8.8.8', 53)), s.getsockname()[0], s.close()) for s in [socket.socket(socket.AF_INET, socket.SOCK_DGRAM)]][0][1]]) if l][0][0]
 
-def get_ip_address(ifname):
-    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    return socket.inet_ntoa(fcntl.ioctl(
-        s.fileno(),
-        0x8915,  # SIOCGIFADDR
-        struct.pack('256s', ifname[:15])
-    )[20:24])
-
-
-#def get_ip_address2():
-#    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
- #   s.connect(("8.8.8.8", 80))
-  #  return s.getsockname()[0]
-
+#enp0s31f6
+ipv4 = re.search(re.compile(r'(?<=inet )(.*)(?=\/)', re.M), os.popen('ip addr show enp0s31f6').read()).groups()[0]
 
 ATTRIBUTE_AUTHORITY_URL = 'http://localhost:8095'
 KEY_EXCHANGE_URL = 'http://localhost:20001'
@@ -60,11 +49,15 @@ OAUTH2_PROVIDER_TOKEN_EXPIRES_IN = 31536000
 # openIDconnect
 DEFAULT_CALLBACK_PATH = 'contacts/oidc/callback'
 
-#hostname=socket.gethostname()
-#IPAddr=get_ip_address2()
-IPAddr2= get_ip_address('ens3')
+print([l for l in ([ip for ip in socket.gethostbyname_ex(socket.gethostname())[2] if not ip.startswith("127.")][:1], [[(s.connect(('8.8.8.8', 53)), s.getsockname()[0], s.close()) for s in [socket.socket(socket.AF_INET, socket.SOCK_DGRAM)]][0][1]]) if l][0][0])
 
-HOST = IPAddr2 +':20000'  # This service port
+#hostname=socket.gethostname()
+#IPAddr=get_ip_address3()
+#IPAddr2= get_ip_address('ens3')
+#IPAddr2=get_ip_address('enp0s31f6')
+
+
+HOST = ipv4 +':20000'  # This service port
 CLIENT_SECRET = '00e4a5f3-fb85-4a5e-be9e-cd77e1c48115'  # Client Secret
 CLIENT_ID = 'pamtest'  # Client ID
 REALM = 'master'  # Keycloak realm
