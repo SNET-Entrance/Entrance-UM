@@ -2,8 +2,8 @@ app.controller("FitnessController", function($scope, $controller, FitnessService
     $controller('WidgetController', { $scope: $scope });
 
     $scope.activities = [];
-    $scope.resolution = 150;
-    $scope.chartHeight = '150';
+    $scope.resolution = 200;
+    $scope.chartHeight = '250';
     $scope.currentRecord = 0;
     $scope.activityDateTime = '';
 
