@@ -74,7 +74,7 @@ app.factory('FitnessService', function($http) {
                     var mm = item.session_total_elapsed_time_s / 60;
                     var ss = pad(((60 * (mm % 1)) + '').split('.')[0]);
                     mm = (mm + '').split('.')[0];
-                    activity.time = mm + ':' + ss;
+                    activity.time = mm + ':' + ss + '/'+ mm/60 + 'h' + ss;
                 }
 
                 if (activity.avgSpeed == 0)
