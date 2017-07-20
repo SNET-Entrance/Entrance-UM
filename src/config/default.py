@@ -41,7 +41,7 @@ OAUTH2_PROVIDER_TOKEN_EXPIRES_IN = 31536000
 # openIDconnect
 DEFAULT_CALLBACK_PATH = 'contacts/oidc/callback'
 #SSP_IP
-HOST = '134.158.74.59:20000'  # This service port
+HOST = 'localhost:20000'  # This service port
 CLIENT_SECRET = '00e4a5f3-fb85-4a5e-be9e-cd77e1c48115'  # Client Secret
 CLIENT_ID = 'pamtest'  # Client ID
 REALM = 'master'  # Keycloak realm
